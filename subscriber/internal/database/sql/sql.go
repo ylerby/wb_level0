@@ -47,8 +47,8 @@ func (s *Sql) GetById(id int) (*models.Model, bool) {
 	s.DB.First(&model, id)
 	if model.ID == 0 && id != 0 {
 		log.Println("value not found")
+		return nil, false
 	}
-	log.Println("model id = ", model.ID)
 	return &model, true
 }
 

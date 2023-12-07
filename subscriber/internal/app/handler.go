@@ -20,8 +20,6 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 		val, ok := a.Cache.GetById(id)
 		if ok {
 			log.Println("попытка получения значения из кеша")
-			res := a.Cache.GetAllRecords()
-			log.Println(len(res))
 			response, err := json.Marshal(*val)
 			if err != nil {
 				log.Printf("ошибка при сериализации объекта %s", err)
@@ -33,6 +31,7 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 				log.Printf("ошибка при ответе %s", err)
 				http.Redirect(w, r, "/", http.StatusBadRequest)
 			}
+			return
 		} else {
 			log.Println("попытка получения значения из sql")
 			sqlVal, ok := a.Sql.GetById(id)
@@ -48,7 +47,6 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 					log.Printf("ошибка при сериализации объекта %s", err)
 					http.Redirect(w, r, "/", http.StatusBadRequest)
 				}
-				//todo: получение html файла, сделать docker-compose для nats, сделать красивый вывод json, тестирование
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)

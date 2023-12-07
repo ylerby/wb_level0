@@ -48,9 +48,17 @@ func (a *App) Run() {
 		log.Printf("ошибка при подключении к БД %s", err)
 	}
 
+	records, isEmpty := a.Sql.GetAllRecords()
+	if isEmpty {
+		log.Println("записей нет, бд пуста")
+	} else {
+		a.Cache.CacheDownloading(records)
+		log.Println("записи записаны в кеш")
+	}
+
 	sub, err := sc.Subscribe(channel, a.Sub, stan.DeliverAllAvailable())
 	if err != nil {
-		log.Printf("ошибка при подписке %s", err)
+		log.Fatalf("ошибка при подписке %s", err)
 	}
 
 	log.Println("подключен канал")
@@ -61,14 +69,6 @@ func (a *App) Run() {
 			log.Printf("ошибка при закрытии %s", err)
 		}
 	}()
-
-	records, isEmpty := a.Sql.GetAllRecords()
-	if isEmpty {
-		log.Println("записей нет, бд пуста")
-	} else {
-		a.Cache.CacheDownloading(records)
-		log.Println("записи записаны в кеш")
-	}
 
 	http.HandleFunc("/", a.Get)
 

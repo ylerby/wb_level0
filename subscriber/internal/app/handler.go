@@ -17,15 +17,16 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/", http.StatusBadRequest)
 		}
 
+		log.Println("Попытка получения значения из кеша")
 		val, ok := a.Cache.GetById(id)
 		if ok {
-			log.Println("попытка получения значения из кеша")
 			response, err := json.Marshal(*val)
 			if err != nil {
 				log.Printf("ошибка при сериализации объекта %s", err)
 				http.Redirect(w, r, "/", http.StatusBadRequest)
 			}
-			log.Println("значение получено из кеша")
+
+			log.Println("Значение получено из кеша")
 			_, err = w.Write(response)
 			if err != nil {
 				log.Printf("ошибка при ответе %s", err)
@@ -33,11 +34,9 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		} else {
-			log.Println("попытка получения значения из sql")
+			log.Println("Попытка получения значения из sql")
 			sqlVal, ok := a.Sql.GetById(id)
 			if !ok {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
 				_, err = w.Write([]byte("Заказ с таким id не найден"))
 				if err != nil {
 					log.Printf("ошибка при ответе %s", err)
@@ -50,8 +49,6 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 					http.Redirect(w, r, "/", http.StatusBadRequest)
 				}
 
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
 				_, err = w.Write(response)
 				if err != nil {
 					log.Printf("ошибка при ответе %s", err)

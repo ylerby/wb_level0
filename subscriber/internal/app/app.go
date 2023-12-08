@@ -31,22 +31,24 @@ func New() *App {
 }
 
 func (a *App) Run() {
-	log.Println("запуск")
+	log.Println("Запуск приложения")
+
 	a.Cache.Connect()
-	log.Println("подключен кеш")
+	log.Println("Подключен кеш")
+
 	sc, channel, err := a.Nats.Connect()
 	if err != nil {
-		log.Printf("ошибка при работе с nats %s", err)
+		log.Fatalf("ошибка при работе с nats %s", err)
 	}
 
-	log.Println("подключен натс")
+	log.Println("Подключен брокер сообщений")
 
 	err = a.Sql.Connect()
 
-	log.Println("подключен sql")
+	log.Println("Подключена БД SQL")
 
 	if err != nil {
-		log.Printf("ошибка при подключении к БД %s", err)
+		log.Fatalf("ошибка при подключении к БД %s", err)
 	}
 
 	wg := &sync.WaitGroup{}
@@ -57,7 +59,7 @@ func (a *App) Run() {
 		log.Fatalf("ошибка при подписке %s", err)
 	}
 
-	log.Println("подключен канал")
+	log.Println("Подключен канал")
 
 	defer func() {
 		err = sub.Close()
@@ -71,7 +73,7 @@ func (a *App) Run() {
 
 	http.HandleFunc("/", a.Get)
 
-	log.Println("запуск сервера")
+	log.Println("Запуск сервера")
 
 	err = a.Server.ListenAndServe()
 	if err != nil {
@@ -80,7 +82,7 @@ func (a *App) Run() {
 }
 
 func (a *App) Stop() {
-	log.Println("завершение работы сервера")
+	log.Println("Завершение работы сервера")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -96,6 +98,7 @@ func (a *App) Sub(msg *stan.Msg) {
 		log.Printf("ошибка при десериализации %s", err)
 		return
 	}
+
 	a.Sql.AddRecord(model)
 	a.Cache.AddRecord(model)
 }

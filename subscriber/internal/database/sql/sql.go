@@ -23,12 +23,12 @@ func (s *Sql) Connect() error {
 	if err != nil {
 		return fmt.Errorf("ошибка при подключении к БД %s", err)
 	}
-	log.Println("подключена бд")
+	log.Println("Успешное подключение к БД")
 	err = s.DB.AutoMigrate(&models.Model{}, &models.Delivery{}, &models.Items{}, &models.Payment{})
 	if err != nil {
 		return fmt.Errorf("ошибка при миграции %s", err)
 	}
-	log.Println("миграции совершены")
+	log.Println("Миграции совершены")
 	return nil
 }
 
@@ -43,10 +43,9 @@ func (s *Sql) GetAllRecords() ([]models.Model, bool) {
 
 func (s *Sql) GetById(id int) (*models.Model, bool) {
 	var model models.Model
-	log.Println("sql id = ", id)
 	s.DB.First(&model, id)
 	if model.ID == 0 && id != 0 {
-		log.Println("value not found")
+		log.Println("Значение не найдено")
 		return nil, false
 	}
 	return &model, true

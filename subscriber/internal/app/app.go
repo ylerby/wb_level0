@@ -68,8 +68,13 @@ func (a *App) Run() {
 		}
 	}()
 
-	records, _ := a.Sql.GetAllRecords()
-	a.Cache.CacheDownloading(records)
+	records, isEmpty := a.Sql.GetAllRecords()
+	if isEmpty {
+		log.Println("Записей нет, БД пуста")
+	} else {
+		a.Cache.CacheDownloading(records)
+		log.Println("Записи добавлены в кеш")
+	}
 
 	http.HandleFunc("/", a.Get)
 

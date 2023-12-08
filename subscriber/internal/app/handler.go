@@ -14,7 +14,11 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(formId)
 		if err != nil {
 			log.Printf("ошибка при конвертации id записи %s", err)
-			http.Redirect(w, r, "/", http.StatusBadRequest)
+			_, err = w.Write([]byte("Некорректное значение id"))
+			if err != nil {
+				log.Printf("ошибка при записи %s", err)
+			}
+			return
 		}
 
 		log.Println("Попытка получения значения из кеша")

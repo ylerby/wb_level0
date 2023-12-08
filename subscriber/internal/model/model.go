@@ -8,6 +8,7 @@ import (
 type Delivery struct {
 	gorm.Model
 	DeliveryID int    `gorm:"primaryKey;autoIncrement"`
+	ID         int    `gorm:"type:int"`
 	Name       string `gorm:"type:varchar(255)"`
 	Phone      string `gorm:"type:varchar(255)"`
 	Zip        string `gorm:"type:varchar(255)"`
@@ -20,6 +21,7 @@ type Delivery struct {
 type Payment struct {
 	gorm.Model
 	PaymentID    int    `gorm:"primaryKey;autoIncrement"`
+	ID           int    `gorm:"type:int"`
 	Transaction  string `gorm:"type:varchar(255)"`
 	RequestId    string `gorm:"type:varchar(255)"`
 	Currency     string `gorm:"type:varchar(255)"`

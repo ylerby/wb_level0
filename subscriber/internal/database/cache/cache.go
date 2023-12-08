@@ -30,16 +30,18 @@ func (c *Cache) AddRecord(jsonModel json.ModelJson) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	delivery := models.Delivery{
-		Name:    jsonModel.Delivery.Name,
-		Phone:   jsonModel.Delivery.Phone,
-		Zip:     jsonModel.Delivery.Zip,
-		City:    jsonModel.Delivery.City,
-		Address: jsonModel.Delivery.Address,
-		Region:  jsonModel.Delivery.Region,
-		Email:   jsonModel.Delivery.Email,
+		DeliveryID: c.GetCacheSize() - 1,
+		Name:       jsonModel.Delivery.Name,
+		Phone:      jsonModel.Delivery.Phone,
+		Zip:        jsonModel.Delivery.Zip,
+		City:       jsonModel.Delivery.City,
+		Address:    jsonModel.Delivery.Address,
+		Region:     jsonModel.Delivery.Region,
+		Email:      jsonModel.Delivery.Email,
 	}
 
 	payment := models.Payment{
+		PaymentID:    c.GetCacheSize() - 1,
 		Transaction:  jsonModel.Payment.Transaction,
 		RequestId:    jsonModel.Payment.RequestId,
 		Currency:     jsonModel.Payment.Currency,
@@ -55,6 +57,7 @@ func (c *Cache) AddRecord(jsonModel json.ModelJson) {
 	var items []models.Items
 	for _, item := range jsonModel.Items {
 		items = append(items, models.Items{
+			ID:          c.GetCacheSize() - 1,
 			ChrtId:      item.ChrtId,
 			TrackNumber: item.TrackNumber,
 			Price:       item.Price,
@@ -70,6 +73,7 @@ func (c *Cache) AddRecord(jsonModel json.ModelJson) {
 	}
 
 	newModel := models.Model{
+		ID:                c.GetCacheSize() - 1,
 		OrderUid:          jsonModel.OrderUid,
 		TrackNumber:       jsonModel.TrackNumber,
 		Entry:             jsonModel.Entry,

@@ -36,6 +36,8 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 			log.Println("попытка получения значения из sql")
 			sqlVal, ok := a.Sql.GetById(id)
 			if !ok {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
 				_, err = w.Write([]byte("Заказ с таким id не найден"))
 				if err != nil {
 					log.Printf("ошибка при ответе %s", err)

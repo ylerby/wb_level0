@@ -3,9 +3,11 @@ package cache
 import (
 	"subscriber/api/json"
 	models "subscriber/internal/model"
+	"sync"
 )
 
-type Client struct {
+type Cache struct {
+	mu sync.Mutex
 	DB map[int]models.Model
 }
 
@@ -15,4 +17,5 @@ type InterfaceCache interface {
 	GetCacheSize() int
 	AddRecord(model json.ModelJson)
 	CacheDownloading(modelSlice []models.Model)
+	GetAllRecords() map[int]models.Model
 }

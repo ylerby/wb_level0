@@ -7,14 +7,18 @@ import (
 )
 
 func New() InterfaceCache {
-	return &Client{}
+	return &Cache{}
 }
 
-func (c *Client) Connect() {
+func (c *Cache) Connect() {
 	c.DB = make(map[int]models.Model)
 }
 
-func (c *Client) GetById(id int) (*models.Model, bool) {
+func (c *Cache) GetCacheSize() int {
+	return len(c.DB)
+}
+
+func (c *Cache) GetById(id int) (*models.Model, bool) {
 	value, ok := c.DB[id]
 	if ok {
 		return &value, true
@@ -22,17 +26,9 @@ func (c *Client) GetById(id int) (*models.Model, bool) {
 	return nil, false
 }
 
-func (c *Client) CacheDownloading(modelSlice []models.Model) {
-	for index, value := range modelSlice {
-		c.DB[index] = value
-	}
-}
-
-func (c *Client) GetCacheSize() int {
-	return len(c.DB)
-}
-
-func (c *Client) AddRecord(jsonModel json.ModelJson) {
+func (c *Cache) AddRecord(jsonModel json.ModelJson) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	delivery := models.Delivery{
 		Name:    jsonModel.Delivery.Name,
 		Phone:   jsonModel.Delivery.Phone,
@@ -90,4 +86,16 @@ func (c *Client) AddRecord(jsonModel json.ModelJson) {
 		OofShard:          jsonModel.OofShard,
 	}
 	c.DB[c.GetCacheSize()-1] = newModel
+}
+
+func (c *Cache) CacheDownloading(modelSlice []models.Model) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for index, value := range modelSlice {
+		c.DB[index+1] = value
+	}
+}
+
+func (c *Cache) GetAllRecords() map[int]models.Model {
+	return c.DB
 }

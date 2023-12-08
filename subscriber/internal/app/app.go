@@ -10,6 +10,7 @@ import (
 	"subscriber/internal/database/cache"
 	"subscriber/internal/database/sql"
 	"subscriber/internal/service"
+	"sync"
 	"time"
 )
 
@@ -48,15 +49,10 @@ func (a *App) Run() {
 		log.Printf("ошибка при подключении к БД %s", err)
 	}
 
-	records, isEmpty := a.Sql.GetAllRecords()
-	if isEmpty {
-		log.Println("записей нет, бд пуста")
-	} else {
-		a.Cache.CacheDownloading(records)
-		log.Println("записи записаны в кеш")
-	}
-
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 	sub, err := sc.Subscribe(channel, a.Sub, stan.DeliverAllAvailable())
+	wg.Done()
 	if err != nil {
 		log.Fatalf("ошибка при подписке %s", err)
 	}
@@ -69,6 +65,9 @@ func (a *App) Run() {
 			log.Printf("ошибка при закрытии %s", err)
 		}
 	}()
+
+	records, _ := a.Sql.GetAllRecords()
+	a.Cache.CacheDownloading(records)
 
 	http.HandleFunc("/", a.Get)
 
@@ -97,7 +96,6 @@ func (a *App) Sub(msg *stan.Msg) {
 		log.Printf("ошибка при десериализации %s", err)
 		return
 	}
-
-	a.Cache.AddRecord(model)
 	a.Sql.AddRecord(model)
+	a.Cache.AddRecord(model)
 }

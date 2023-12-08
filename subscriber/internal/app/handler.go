@@ -63,7 +63,7 @@ func (a *App) Get(w http.ResponseWriter, r *http.Request) {
 			</head>
 			<body>
 			   <h1>Получение записи по id </h1>
-			   <form action="/submit" method="post">
+			   <form action="/" method="post">
 				  <label for="id">Введите ID:</label><br>
 				  <input type="text" id="id" name="id"><br>
 				  <input type="submit" value="Отправить">
